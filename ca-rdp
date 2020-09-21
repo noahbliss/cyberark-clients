@@ -1,1 +1,10 @@
-/home/noah.bliss/bin/ca-rdp
+#!/usr/bin/env bash
+# Noah Bliss
+# Parses .rdp file, invokes rdesktop, and deletes original rdp file. 
+file="$1"
+[ -z "$file" ] && echo "Need to specify an RDP file." && exit 1
+username="-u$(sed -n '/username:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_@\-]*).*#\1#p")"
+shell="-s$(sed -n '/alternate shell:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_@\-]*).*#\1#p")"
+target=$(sed -n '/full address:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_\-]*).*#\1#p")
+rm "$file"
+rdesktop "$target" "$username" "$shell"

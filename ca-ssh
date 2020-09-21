@@ -1,1 +1,12 @@
-/home/noah.bliss/bin/ca-ssh
+#!/usr/bin/env bash
+# Noah Bliss
+# Simplifies connections to ssh targets using the cyberark psmp server.
+# Update cyberark/user.conf and cyberark/psmp.conf with your values before using.
+configpath=$HOME/.config/cyberark
+fallbackconfigpath=./cyberark
+if ! [ -d "$configpath" ]; then configpath="$fallbackconfigpath"; fi
+source ~/.config/cyberark/user.conf
+source ~/.config/cyberark/psmp.conf
+targetacc=$(echo "$1" | cut -d@ -f1)
+target=$(echo "$1" | cut -d@ -f2)
+ssh "$username"@"$targetacc"@"$target"@"$psmpserver"
