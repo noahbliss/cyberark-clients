@@ -3,8 +3,25 @@
 # Parses .rdp file, invokes rdesktop, and deletes original rdp file. 
 file="$1"
 [ -z "$file" ] && echo "Need to specify an RDP file." && exit 1
-username="-u$(sed -n '/username:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_@\-]*).*#\1#p")"
-shell="-s$(sed -n '/alternate shell:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_@\-]*).*#\1#p")"
-target=$(sed -n '/full address:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_\-]*).*#\1#p")
+
+rdesktop() {
+	username="-u$(sed -n '/username:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_@\-]*).*#\1#p")"
+	shell="-s$(sed -n '/alternate shell:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_@\-]*).*#\1#p")"
+	target=$(sed -n '/full address:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_\-]*).*#\1#p")
+}
+
+freerdp() {
+	if [ $WAYLAND_DISPLAY ]; then
+		#wayland
+		if ! wlfreerdp "$file"; then echo "Error launching wayland wlfreerdp."; fi
+	elif [ $DISPLAY ]; then
+		#x11
+		if ! xfreerdp "$file"; then echo "Error launching x11 xfreerdp."; fi
+	else
+		echo "Could not find a wayland or x11 display to connect to!"
+		exit 2
+	fi
+}
+method=freerdp #freerdp|rdesktop
+${method}
 rm "$file"
-rdesktop "$target" "$username" "$shell"
