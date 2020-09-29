@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=CyberArk RDP Client
+Comment=Opens CyberArk RDP files with rdesktop.
+Exec=/usr/local/bin/ca-rdp %U
+Icon=
+Terminal=false
+Type=Application
+MimeType=x-scheme-handler/rdp
