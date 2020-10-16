@@ -8,15 +8,20 @@ rdesktop() {
 	username="-u$(sed -n '/username:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_@\-]*).*#\1#p")"
 	shell="-s$(sed -n '/alternate shell:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_@\-]*).*#\1#p")"
 	target=$(sed -n '/full address:/p' "$file" | sed -nE "s#.*:([0-9.A-Za-z_\-]*).*#\1#p")
+	rdesktop "$target" "$username" "$shell"
 }
 
 freerdp() {
+	# Trim out the bothersome restrictions. 
+	sed '/desktopwidth/d' "$file"
+	sed '/desktopheight/d' "$file"
+	options="/dynamic-resolution /drive:home,$HOME"
 	if [ $WAYLAND_DISPLAY ]; then
 		#wayland
-		if ! wlfreerdp "$file"; then echo "Error launching wayland wlfreerdp."; fi
+		if ! wlfreerdp "$file" $options; then echo "Error launching wayland wlfreerdp."; fi
 	elif [ $DISPLAY ]; then
 		#x11
-		if ! xfreerdp "$file"; then echo "Error launching x11 xfreerdp."; fi
+		if ! xfreerdp "$file" $options; then echo "Error launching x11 xfreerdp."; fi
 	else
 		echo "Could not find a wayland or x11 display to connect to!"
 		exit 2
