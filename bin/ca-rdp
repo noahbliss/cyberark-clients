@@ -15,6 +15,7 @@ freerdp() {
 	# Trim out the bothersome restrictions. 
 	sed '/desktopwidth/d' "$file"
 	sed '/desktopheight/d' "$file"
+	sed '/screen mode id/d' "$file"
 	options="/dynamic-resolution /drive:home,$HOME"
 	if [ $WAYLAND_DISPLAY ]; then
 		#wayland
